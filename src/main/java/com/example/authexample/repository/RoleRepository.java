@@ -1,9 +1,12 @@
 package com.example.authexample.repository;
 
 import com.example.authexample.domain.Role;
-import org.springframework.data.repository.CrudRepository;
+import com.example.authexample.domain.RoleName;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RoleRepository extends CrudRepository<Role, Long> {
+import java.util.Optional;
 
-    Role findByName(String name);
+public interface RoleRepository extends JpaRepository<Role, Long> {
+
+    Optional<Role> findByRoleName(RoleName roleName);
 }
