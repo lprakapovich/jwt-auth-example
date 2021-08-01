@@ -16,4 +16,6 @@ public interface UserService {
     User getUser(String username);
 
     List<User> getUsers();
+
+    List<Role> getRoles();
 }
