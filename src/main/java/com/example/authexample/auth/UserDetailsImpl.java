@@ -26,7 +26,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public static UserDetailsImpl build(User user) {
         Set<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
+                .map(role -> new SimpleGrantedAuthority(role.getSystemRole().name()))
                 .collect(Collectors.toSet());
         return new UserDetailsImpl(user.getUsername(), user.getPassword(), authorities);
     }
@@ -34,4 +34,5 @@ public class UserDetailsImpl implements UserDetails {
     public UserDetailsImpl(String username, String password, Set<? extends GrantedAuthority> authorities) {
         this(username, password, authorities, true, true, true, true);
     }
+
 }

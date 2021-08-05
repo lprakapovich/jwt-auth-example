@@ -1,8 +1,8 @@
 package com.example.authexample.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 
@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Table(name = "roles")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Role {
 
     @Id
@@ -18,5 +17,9 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private RoleName roleName;
+    private SystemRole systemRole;
+
+    public Role(SystemRole systemRole) {
+        this.systemRole = systemRole;
+    }
 }

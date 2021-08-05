@@ -1,14 +1,14 @@
 package com.example.authexample.security;
 
 import com.example.authexample.auth.UserDetailsServiceImpl;
-import com.example.authexample.jwt.AuthenticationTokenFilter;
+import com.example.authexample.jwt.JwtTokenFilter;
+import com.example.authexample.jwt.JwtAuthEntryPoint;
 import com.example.authexample.jwt.JwtConfig;
 import com.example.authexample.jwt.JwtUsernameAndPasswordAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -32,16 +32,17 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SecretKey secretKey;
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsServiceImpl userDetailsService;
-
-    @Bean
-    public AuthenticationTokenFilter authenticationJwtTokenFilter() {
-        return new AuthenticationTokenFilter(userDetailsService, jwtConfig, secretKey);
-    }
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public JwtTokenFilter authenticationJwtTokenFilter() {
+        return new JwtTokenFilter(userDetailsService, jwtConfig, secretKey);
     }
 
     @Bean
@@ -53,7 +54,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
@@ -61,12 +62,14 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(STATELESS)
-                .and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthEntryPoint).and()
+                .sessionManagement().sessionCreationPolicy(STATELESS).and()
                 .addFilter(new JwtUsernameAndPasswordAuthFilter(authenticationManager(), jwtConfig, secretKey, passwordEncoder))
                 .addFilterAfter(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/", "/api/auth/signup", "/login", "/api/auth/signin", "/api/test").permitAll()
+                .and()
+                .authorizeRequests()
                 .anyRequest()
                 .authenticated();
     }
