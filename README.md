@@ -1,4 +1,4 @@
-# Example of JWT authentication and role-based access control
+# JWT authentication & authorization
 
 Technical stack: 
 1. SpringBoot & Spring Data JPA 
