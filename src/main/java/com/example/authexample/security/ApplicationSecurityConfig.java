@@ -53,6 +53,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         return provider;
     }
 
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(daoAuthenticationProvider());
@@ -63,14 +64,12 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthEntryPoint).and()
-                .sessionManagement().sessionCreationPolicy(STATELESS).and()
+                .sessionManagement().sessionCreationPolicy(STATELESS)
+                .and()
                 .addFilter(new JwtUsernameAndPasswordAuthFilter(authenticationManager(), jwtConfig, secretKey, passwordEncoder))
                 .addFilterAfter(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/", "/api/auth/signup", "/login", "/api/auth/signin", "/api/test").permitAll()
-                .and()
-                .authorizeRequests()
-                .anyRequest()
-                .authenticated();
+                .antMatchers("/", "/api/auth/register", "/api/auth/login", "/api/test").permitAll()
+                .anyRequest().authenticated();
     }
 }
